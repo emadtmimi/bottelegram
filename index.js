@@ -31,7 +31,7 @@ bot.on('message', async (ctx, next) => {
 });
 // أمر /help - تعليمات البوت
 bot.command('help', async (ctx) => {
-  await ctx.reply('الأوامر المتاحة:\n/start - بدء البوت\n/help - المساعدة\n/enhance - تحسين جودة الصورة'\n/about - عن البوت');
+  await ctx.reply('الأوامر المتاحة:\n/start - بدء البوت\n/help - المساعدة\n/enhance - تحسين جودة الصورة\n/about - عن البوت');
 });
 // أمر /enhance - لتحسين جودة الصورة
 bot.command('enhance', async (ctx) => {
