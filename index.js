@@ -23,7 +23,14 @@ bot.on('message', async (ctx, next) => {
     await next();
   }
 });
-
+// أمر /help - تعليمات البوت
+bot.command('help', async (ctx) => {
+  await ctx.reply('الأوامر المتاحة:\n/start - بدء البوت\n/help - المساعدة\n/enhance - تحسين جودة الصورة');
+});
+// أمر /enhance - لتحسين جودة الصورة
+bot.command('enhance', async (ctx) => {
+  await ctx.reply('أرسل الصورة لتحسين جودتها.');
+});
 // التقط الصور المرسلة كـ Photo (يضغطها تيليجرام)
 bot.on('photo', async (ctx) => {
   try {
