@@ -17,6 +17,12 @@ bot.start((ctx) =>
 
 // التلميح للمستخدم إذا أرسل شيئاً غير صورة
 bot.on('message', async (ctx, next) => {
+  // السماح بالأوامر أولاً
+  if (ctx.message.text && ctx.message.text.startsWith('/')) {
+    return next(); // تمرير الأمر للمعالجة العادية
+  }
+
+  // إذا لم تكن صورة أو ملف
   if (!ctx.message.photo && !ctx.message.document) {
     await ctx.reply('أرسل صورة (كصورة أو كملف) من فضلك 🙂');
   } else {
