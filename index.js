@@ -87,12 +87,6 @@ async function processAndReply(ctx, telegramFilePath) {
     .normalize()            // توازن إضاءة وتشبع تلقائي
     .median(3)              // إزالة ضوضاء خفيفة
     .sharpen(1.0)           // زيادة حدة خفيفة (amount=1.0)
-    .resize({
-      width: width ? Math.round(width * scale) : undefined,
-      height: height ? Math.round(height * scale) : undefined,
-      kernel: sharp.kernel.lanczos3,
-      withoutEnlargement: false
-    })
     .jpeg({
       quality: 92,          // جودة عالية
       chromaSubsampling: '4:4:4',
@@ -101,7 +95,7 @@ async function processAndReply(ctx, telegramFilePath) {
     .toBuffer();
 
   // إرسال النتيجة للمستخدم
-  await ctx.replyWithPhoto({ source: outBuffer }, { caption: '✅ تمت المعالجة: تكبير + تحسين' });
+  await ctx.replyWithPhoto({ source: outBuffer }, { caption: '✅ تمت المعالجة: تحسين الصورة بنجاح' });
 }
 
 // تشغيل البوت (polling)
