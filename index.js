@@ -37,6 +37,10 @@ bot.command('help', async (ctx) => {
 bot.command('enhance', async (ctx) => {
   await ctx.reply('أرسل الصورة لتحسين جودتها.');
 });
+// أمر /about - لتحسين جودة الصورة
+bot.command('about', async (ctx) => {
+  await ctx.reply('هذا البوت يقوم بتحسين الصور  بدقة عالية تم برمجة هذا البوت بواسطة عماد التميمي  @em_mg');
+});
 // التقط الصور المرسلة كـ Photo (يضغطها تيليجرام)
 bot.on('photo', async (ctx) => {
   try {
