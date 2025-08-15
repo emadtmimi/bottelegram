@@ -7,6 +7,13 @@ import crypto from 'crypto';
 const userData = {};
 const FREE_LIMIT = 2; // عدد الصور المسموح مجاناً
 const SECRET_KEY = "emadok"; // مفتاح سري لا يعرفه أحد غيرك
+const BOT_TOKEN = process.env.BOT_TOKEN || 'PUT_YOUR_TOKEN_HERE';
+if (!BOT_TOKEN || BOT_TOKEN === 'PUT_YOUR_TOKEN_HERE') {
+  console.error('❌ ضع توكن البوت في BOT_TOKEN (env).');
+  process.exit(1);
+}
+
+const bot = new Telegraf(BOT_TOKEN);
 
 // دالة توليد الرقم التسلسلي من Telegram ID
 function generateSerial(userId) {
@@ -67,13 +74,7 @@ async function checkUserLimit(ctx) {
   }
   return true;
 }
-const BOT_TOKEN = process.env.BOT_TOKEN || 'PUT_YOUR_TOKEN_HERE';
-if (!BOT_TOKEN || BOT_TOKEN === 'PUT_YOUR_TOKEN_HERE') {
-  console.error('❌ ضع توكن البوت في BOT_TOKEN (env).');
-  process.exit(1);
-}
 
-const bot = new Telegraf(BOT_TOKEN);
 
 // لحفظ أبعاد تغيير الحجم لكل مستخدم
 const resizeSettings = {};
