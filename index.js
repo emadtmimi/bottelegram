@@ -2,7 +2,71 @@ import 'dotenv/config';
 import { Telegraf } from 'telegraf';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
+import crypto from 'crypto';
 
+const userData = {};
+const FREE_LIMIT = 2; // عدد الصور المسموح مجاناً
+const SECRET_KEY = "emadok"; // مفتاح سري لا يعرفه أحد غيرك
+
+// دالة توليد الرقم التسلسلي من Telegram ID
+function generateSerial(userId) {
+  return crypto.createHash('md5').update(userId + SECRET_KEY).digest('hex').substring(0, 8);
+}
+
+// دالة توليد كود التفعيل من الرقم التسلسلي
+function generateActivationCode(serial) {
+  return crypto.createHash('sha256').update(serial + SECRET_KEY).digest('hex').substring(0, 8).toUpperCase();
+}
+
+// أمر عرض الرقم التسلسلي للمستخدم
+bot.command('serial', async (ctx) => {
+  const userId = ctx.from.id.toString();
+  const serial = generateSerial(userId);
+  if (!userData[userId]) {
+    userData[userId] = { activated: false, count: 0, serial };
+  }
+  await ctx.reply(`🔑 الرقم التسلسلي الخاص بك:\n${serial}\n📩 أرسله للمبرمج للحصول على كود التفعيل.`);
+});
+
+// أمر التفعيل
+bot.command('activate', async (ctx) => {
+  const userId = ctx.from.id.toString();
+  const serial = userData[userId]?.serial || generateSerial(userId);
+
+  const code = ctx.message.text.split(' ')[1];
+  if (!code) {
+    return ctx.reply('❗ أرسل كود التفعيل هكذا:\n/activate كود_التفعيل');
+  }
+
+  const correctCode = generateActivationCode(serial);
+  if (code.toUpperCase() === correctCode) {
+    userData[userId].activated = true;
+    userData[userId].count = 0;
+    await ctx.reply('✅ تم التفعيل بنجاح! يمكنك الآن معالجة عدد غير محدود من الصور.');
+  } else {
+    await ctx.reply('❌ كود التفعيل غير صحيح.');
+  }
+});
+
+// التحقق قبل معالجة أي صورة
+async function checkUserLimit(ctx) {
+  const userId = ctx.from.id.toString();
+  if (!userData[userId]) {
+    const serial = generateSerial(userId);
+    userData[userId] = { activated: false, count: 0, serial };
+  }
+
+  if (!userData[userId].activated) {
+    if (userData[userId].count >= FREE_LIMIT) {
+      await ctx.reply(
+        `⚠️ انتهت الفترة التجريبية.\n🔑 الرقم التسلسلي: ${userData[userId].serial}\n📩 أرسله للمبرمج للحصول على كود التفعيل ثم استخدم:\n/activate كود_التفعيل`
+      );
+      return false;
+    }
+    userData[userId].count++;
+  }
+  return true;
+}
 const BOT_TOKEN = process.env.BOT_TOKEN || 'PUT_YOUR_TOKEN_HERE';
 if (!BOT_TOKEN || BOT_TOKEN === 'PUT_YOUR_TOKEN_HERE') {
   console.error('❌ ضع توكن البوت في BOT_TOKEN (env).');
@@ -96,6 +160,8 @@ bot.on('document', async (ctx) => {
 });
 
 async function processAndReply(ctx, telegramFilePath) {
+   // التحقق من الحد
+  if (!(await checkUserLimit(ctx))) return;
   const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${telegramFilePath}`;
   const res = await fetch(fileUrl);
   if (!res.ok) throw new Error('فشل تنزيل الصورة من تيليجرام');
