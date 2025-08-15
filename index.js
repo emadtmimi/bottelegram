@@ -24,7 +24,9 @@ function generateSerial(userId) {
 function generateActivationCode(serial) {
   return crypto.createHash('sha256').update(serial + SECRET_KEY).digest('hex').substring(0, 8).toUpperCase();
 }
-
+bot.command('myid', (ctx) => {
+  ctx.reply(`🆔 ID الخاص بك هو: ${ctx.from.id}`);
+});
 // أمر عرض الرقم التسلسلي للمستخدم
 bot.command('serial', async (ctx) => {
   const userId = ctx.from.id.toString();
