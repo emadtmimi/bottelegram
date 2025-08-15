@@ -35,7 +35,9 @@ bot.command('serial', async (ctx) => {
   if (!userData[userId]) {
     userData[userId] = { activated: false, count: 0, serial };
   }
-  await ctx.reply(`🔑 الرقم التسلسلي الخاص بك:\n${serial}\n📩 أرسله للمبرمج للحصول على كود التفعيل.`);
+  await ctx.reply( `🔑 الرقم التسلسلي الخاص بك: ${userData[userId].serial}\n` +
+        `📩 للحصول على كود التفعيل، تواصل معي عبر هذا الرابط:\n` +
+        `https://t.me/${TELEGRAM_USERNAME}?start=${userData[userId].serial}`);
 });
 
 // أمر التفعيل
