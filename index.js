@@ -7,6 +7,7 @@ import crypto from 'crypto';
 const userData = {};
 const FREE_LIMIT = 2; // عدد الصور المسموح مجاناً
 const SECRET_KEY = "emadok"; // مفتاح سري لا يعرفه أحد غيرك
+const TELEGRAM_USERNAME = "em_mg"; 
 const BOT_TOKEN = process.env.BOT_TOKEN || 'PUT_YOUR_TOKEN_HERE';
 if (!BOT_TOKEN || BOT_TOKEN === 'PUT_YOUR_TOKEN_HERE') {
   console.error('❌ ضع توكن البوت في BOT_TOKEN (env).');
@@ -67,8 +68,11 @@ async function checkUserLimit(ctx) {
 
   if (!userData[userId].activated) {
     if (userData[userId].count >= FREE_LIMIT) {
-      await ctx.reply(
-        `⚠️ انتهت الفترة التجريبية.\n🔑 الرقم التسلسلي: ${userData[userId].serial}\n📩 أرسله للمبرمج للحصول على كود التفعيل ثم استخدم:\n/activate كود_التفعيل`
+       await ctx.reply(
+        `⚠️ انتهت الفترة التجريبية.\n` +
+        `🔑 الرقم التسلسلي الخاص بك: ${userData[userId].serial}\n` +
+        `📩 للحصول على كود التفعيل، تواصل معي عبر هذا الرابط:\n` +
+        `https://t.me/${TELEGRAM_USERNAME}`
       );
       return false;
     }
