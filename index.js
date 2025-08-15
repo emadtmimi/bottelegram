@@ -72,7 +72,7 @@ async function checkUserLimit(ctx) {
         `⚠️ انتهت الفترة التجريبية.\n` +
         `🔑 الرقم التسلسلي الخاص بك: ${userData[userId].serial}\n` +
         `📩 للحصول على كود التفعيل، تواصل معي عبر هذا الرابط:\n` +
-        `https://t.me/${TELEGRAM_USERNAME}`
+        `https://t.me/${TELEGRAM_USERNAME}?start=${userData[userId].serial}`
       );
       return false;
     }
