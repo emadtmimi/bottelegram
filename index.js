@@ -160,24 +160,29 @@ bot.on('photo', async (ctx) => {
 });
 
 // استقبال ملفات PDF
-bot.on("document", async (ctx) => {
+bot.on('document', async (ctx) => {
   try {
     const doc = ctx.message.document;
-    if (doc.mime_type === "application/pdf") {
+    const mime = doc.mime_type || "";
+
+    if (mime === "application/pdf") {
       const file = await ctx.telegram.getFile(doc.file_id);
-      await processPdf(ctx, file.file_path);
-    } else if (doc.mime_type.startsWith("image/")) {
+      await processPdf(ctx, file.file_path, doc.file_name || "file.pdf");
+      return;
+    }
+
+    if (mime.startsWith("image/")) {
       const file = await ctx.telegram.getFile(doc.file_id);
       await processAndReply(ctx, file.file_path);
-    } else {
-      return ctx.reply("📂 أرسل فقط ملف PDF أو صورة (JPEG/PNG).");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    await ctx.reply("❌ حدث خطأ أثناء معالجة الملف.");
-  }
-});
 
+    return ctx.reply("📂 النوع غير مدعوم. أرسل صورة (JPEG/PNG) أو ملف PDF.");
+  } catch (err) {
+    console.error("DOCUMENT HANDLER ERROR:", err);
+    await ctx.reply("❌ حدث خطأ أثناء معالجة الملف (DOC).");
+  }
+})
 async function processAndReply(ctx, telegramFilePath) {
    // التحقق من الحد
   if (!(await checkUserLimit(ctx))) return;
