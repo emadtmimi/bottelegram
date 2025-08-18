@@ -3,6 +3,7 @@ import { Telegraf } from 'telegraf';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
 import crypto from 'crypto';
+import { fromBuffer } from "pdf2pic";
 
 const userData = {};
 const FREE_LIMIT = 2; // عدد الصور المسموح مجاناً
@@ -203,6 +204,50 @@ async function processAndReply(ctx, telegramFilePath) {
     .toBuffer();
 
   await ctx.replyWithPhoto({ source: outBuffer }, { caption: '✅ تمت المعالجة بنجاح' });
+}
+
+// استقبال ملفات PDF
+bot.on("document", async (ctx) => {
+  try {
+    const doc = ctx.message.document;
+    if (doc.mime_type === "application/pdf") {
+      const file = await ctx.telegram.getFile(doc.file_id);
+      await processPdf(ctx, file.file_path);
+    } else if (doc.mime_type.startsWith("image/")) {
+      const file = await ctx.telegram.getFile(doc.file_id);
+      await processAndReply(ctx, file.file_path);
+    } else {
+      return ctx.reply("📂 أرسل فقط ملف PDF أو صورة (JPEG/PNG).");
+    }
+  } catch (err) {
+    console.error(err);
+    await ctx.reply("❌ حدث خطأ أثناء معالجة الملف.");
+  }
+});
+
+// دالة معالجة PDF
+async function processPdf(ctx, telegramFilePath) {
+  if (!(await checkUserLimit(ctx))) return;
+
+  const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${telegramFilePath}`;
+  const res = await fetch(fileUrl);
+  if (!res.ok) throw new Error("فشل تنزيل PDF من تيليجرام");
+
+  const inputBuffer = Buffer.from(await res.arrayBuffer());
+
+  // تحويل PDF إلى صورة (الصفحة الأولى فقط مثلاً)
+  const converter = fromBuffer(inputBuffer, {
+    density: 150, // الدقة (كلما زادت تكون الصورة أوضح)
+    format: "jpeg",
+    width: 1024,
+    height: 1448,
+    quality: 80,
+  });
+
+  const pageToConvertAsImage = 1; // أول صفحة
+  const output = await converter(pageToConvertAsImage);
+
+  await ctx.replyWithPhoto({ source: output.path }, { caption: "✅ تم تحويل الصفحة الأولى من PDF إلى صورة" });
 }
 
 bot.launch().then(() => console.log('🤖 Bot is running...'));
