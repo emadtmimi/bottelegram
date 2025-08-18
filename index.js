@@ -93,18 +93,23 @@ bot.start((ctx) =>
   ctx.reply('🤖مرحباً! انا بوت عماد التميمي صممت لخدمتك في تحسين أو تعديل الصور 🖼️\nاكتب /help لعرض الأوامر.')
 );
 
-// التلميح للمستخدم إذا أرسل شيئاً غير صورة
+// التلميح للمستخدم إذا أرسل شيئاً غير صورة أو PDF
 bot.on('message', async (ctx, next) => {
   if (ctx.message.text && ctx.message.text.startsWith('/')) {
     return next();
   }
-  if (!ctx.message.photo && !ctx.message.document) {
-    await ctx.reply('📸 أرسل صورة (كصورة أو كملف) من فضلك.');
+
+  const isPhoto = !!ctx.message.photo;
+  const isDocument = !!ctx.message.document;
+  const mime = ctx.message.document?.mime_type || "";
+
+  // قبول الصور + PDF فقط
+  if (!isPhoto && !(isDocument && (mime.startsWith("image/") || mime === "application/pdf"))) {
+    await ctx.reply('📸 أرسل صورة (كصورة أو كملف) أو ملف PDF من فضلك.');
   } else {
     await next();
   }
 });
-
 // أمر /help
 bot.command('help', async (ctx) => {
   await ctx.reply(
