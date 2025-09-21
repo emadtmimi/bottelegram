@@ -1,0 +1,19 @@
+{
+  "name": "photo-enhancer-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot to enhance photos using Node.js + sharp",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
+    "pdf2pic": "^3.2.0",
+    "sharp": "^0.33.4",
+    "telegraf": "^4.16.3"
+  }
+}
+
